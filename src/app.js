@@ -19,23 +19,43 @@ bot.on('/start', msg => {
     return bot.sendMessage(userId, 'Ask me anything...')
 })
 
+bot.on('text', msg => {
+    console.log(msg)
+})
+
 bot.on('inlineQuery', msg => {
-    let query = msg.query;
+    console.log(msg)
 
-    console.log(`inline query: ${ query }`);
+    // const messageId = msg.id
+    const chatId = msg.from.id
+    const query = msg.query
 
-    const answers = bot.answerList(msg.id, {cacheTime: 0, personal:true});
+    const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
 
     answers.addArticle({
         id: 'query',
         title: 'Ask:',
-        description: `${ query }`,
+        description: `${ query }?`,
         message_text: getRandomMessage(),
-        // thumb_url: 'https://f9e8507b.ngrok.io/src/img/ball.png'
-    });
+        thumb_url: cfg.staticUrl + 'img/ball.png'
+    })
+
+    sendPrediction(chatId, query)
 
     return bot.answerQuery(answers)
 })
+
+function sendPrediction(chatId, caption) {
+    setTimeout(() => {
+        bot
+            .sendPhoto(chatId, getRandomImage(), {
+                caption
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }, 1500)
+}
 
 function getRandomMessage() {
     const replies = [
@@ -47,6 +67,14 @@ function getRandomMessage() {
     const index = Math.floor(Math.random() * replies.length)
 
     return replies[index]
+}
+
+function getRandomImage() {
+    const min = 1
+    const max = 20
+    const rand = Math.floor(Math.random() * (max - min + 1)) + min
+
+    return cfg.staticUrl + 'img/' + rand + '.png'
 }
 
 module.exports = bot.connect.bind(bot)
