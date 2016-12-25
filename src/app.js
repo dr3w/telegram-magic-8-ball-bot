@@ -16,20 +16,37 @@ bot.use(require('./modules/ask.js'))
 bot.on('/start', msg => {
     const userId = msg.from.id
 
-    return bot.sendMessage(userId, 'Hey!')
+    return bot.sendMessage(userId, 'Ask me anything...')
 })
-//
-// bot.on('text', msg => {
-//     const userId = msg.from.id
-//
-//     return bot.sendMessage(userId, 'You wrote: ' + )
-// })
-//
-// bot.on('inlineQuery', msg => {
-//     let userId = msg.from.id
-//     let query = msg.query
-//
-//     return bot.sendMessage(userId, 'Query')
-// })
+
+bot.on('inlineQuery', msg => {
+    let query = msg.query;
+
+    console.log(`inline query: ${ query }`);
+
+    const answers = bot.answerList(msg.id, {cacheTime: 0, personal:true});
+
+    answers.addArticle({
+        id: 'query',
+        title: 'Ask:',
+        description: `${ query }`,
+        message_text: getRandomMessage(),
+        // thumb_url: 'https://f9e8507b.ngrok.io/src/img/ball.png'
+    });
+
+    return bot.answerQuery(answers)
+})
+
+function getRandomMessage() {
+    const replies = [
+        "Let me see...",
+        "Shaking...",
+        "Interesting..."
+    ]
+
+    const index = Math.floor(Math.random() * replies.length)
+
+    return replies[index]
+}
 
 module.exports = bot.connect.bind(bot)
