@@ -3,6 +3,9 @@
 const TeleBot = require('telebot')
 const cfg = require('../config')
 
+const BOT_NAME = '@MagicEightBallBot'
+const CHAT_TYPE_PRIVATE = 'private'
+
 const bot = new TeleBot({
     token: cfg.token,
     webhook: {
@@ -20,32 +23,45 @@ bot.on('/start', msg => {
 })
 
 bot.on('text', msg => {
-    const chatId = msg.chat.id
+    const chatId = msg.chat && msg.chat.id
+    const isChatPrivate = msg.chat && msg.chat.type === CHAT_TYPE_PRIVATE
     const msgId = msg.message_id
+    const msgText = msg.text.trim()
+    const isMsgNotEmpty = !!msgText.replace(`${BOT_NAME}`, '').trim().length
+
+    if (!(
+            isMsgNotEmpty && (isChatPrivate || ~msgText.indexOf(BOT_NAME))
+        )) return
 
     sendRandomMessage(chatId)
         .then(() => sendPrediction(chatId, msgId))
 })
 
 bot.on('inlineQuery', msg => {
-    let query = msg.query.trim()
-
-    if (!query) return
-
-    query = query.replace(/\?+$/, '') + '?'
-
     const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
-
-    answers.addArticle({
-        id: 'query',
-        title: 'Ask:',
-        description: query,
-        message_text: query,
-        thumb_url: cfg.staticUrl + 'img/ball.png'
-    })
 
     return bot.answerQuery(answers)
 })
+
+// bot.on('inlineQuery', msg => {
+//     let query = msg.query.trim()
+//
+//     if (!query) return
+//
+//     query = query.replace(/\?+$/, '') + '?'
+//
+//     const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
+//
+//     answers.addArticle({
+//         id: 'query',
+//         title: 'Ask:',
+//         description: query,
+//         message_text: query,
+//         thumb_url: cfg.staticUrl + 'img/ball.png'
+//     })
+//
+//     return bot.answerQuery(answers)
+// })
 
 /**
  *
