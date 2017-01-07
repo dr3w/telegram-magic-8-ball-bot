@@ -28,9 +28,11 @@ bot.on('text', msg => {
 })
 
 bot.on('inlineQuery', msg => {
-    const query = msg.query.trim()
+    let query = msg.query.trim()
 
     if (!query) return
+
+    query = query.replace(/\?+$/, '') + '?'
 
     const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
 
