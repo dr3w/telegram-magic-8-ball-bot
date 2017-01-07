@@ -20,36 +20,41 @@ bot.on('/start', msg => {
 })
 
 bot.on('text', msg => {
-    console.log(msg)
+    const chatId = msg.chat.id
+    const msgId = msg.message_id
+
+    sendRandomMessage(chatId)
+        .then(() => sendPrediction(chatId, msgId))
 })
 
 bot.on('inlineQuery', msg => {
-    console.log(msg)
+    const query = msg.query.trim()
 
-    // const messageId = msg.id
-    const chatId = msg.from.id
-    const query = msg.query
+    if (!query) return
 
     const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
 
     answers.addArticle({
         id: 'query',
         title: 'Ask:',
-        description: `${ query }?`,
-        message_text: getRandomMessage(),
+        description: query,
+        message_text: query,
         thumb_url: cfg.staticUrl + 'img/ball.png'
     })
-
-    sendPrediction(chatId, query)
 
     return bot.answerQuery(answers)
 })
 
-function sendPrediction(chatId, caption) {
+/**
+ *
+ * @param chatId
+ * @param msgId
+ */
+function sendPrediction(chatId, msgId) {
     setTimeout(() => {
         bot
             .sendPhoto(chatId, getRandomImage(), {
-                caption
+                reply: msgId
             })
             .catch(err => {
                 console.log(err)
@@ -57,11 +62,23 @@ function sendPrediction(chatId, caption) {
     }, 1500)
 }
 
+/**
+ *
+ * @param chatId
+ * @returns {Promise}
+ */
+function sendRandomMessage(chatId) {
+    const botMsg = getRandomMessage()
+
+    return bot.sendMessage(chatId, botMsg)
+}
+
 function getRandomMessage() {
     const replies = [
-        "Let me see...",
-        "Shaking...",
-        "Interesting..."
+        'Let me see...',
+        'Shaking...',
+        'Interesting...',
+        'Give me a moment...'
     ]
 
     const index = Math.floor(Math.random() * replies.length)

@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
-    "telebot": "^1.0.6"
+    "telebot": "git+https://github.com/dr3w/telebot.git#master"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
