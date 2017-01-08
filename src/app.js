@@ -38,30 +38,25 @@ bot.on('text', msg => {
 })
 
 bot.on('inlineQuery', msg => {
+    let query = msg.query.trim()
+
+    if (!query) return
+
+    query = query.replace(/\?+$/, '') + '?'
+
     const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
+
+    answers.addArticle({
+        id: 'query',
+        title: 'Ask:',
+        description: query,
+        message_text: `${BOT_NAME} _${query}_`,
+        parse_mode: 'Markdown',
+        thumb_url: cfg.staticUrl + 'img/ball.png'
+    })
 
     return bot.answerQuery(answers)
 })
-
-// bot.on('inlineQuery', msg => {
-//     let query = msg.query.trim()
-//
-//     if (!query) return
-//
-//     query = query.replace(/\?+$/, '') + '?'
-//
-//     const answers = bot.answerList(msg.id, {cacheTime: 0, personal: true})
-//
-//     answers.addArticle({
-//         id: 'query',
-//         title: 'Ask:',
-//         description: query,
-//         message_text: query,
-//         thumb_url: cfg.staticUrl + 'img/ball.png'
-//     })
-//
-//     return bot.answerQuery(answers)
-// })
 
 /**
  *
